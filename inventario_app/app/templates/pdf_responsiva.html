@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Carta Responsiva</title>
+    <style>
+        /* Estilos optimizados para evitar errores en xhtml2pdf */
+        @page {
+            size: letter;
+            margin: 2cm;
+        }
+        body { font-family: Helvetica, sans-serif; font-size: 10pt; color: #000; }
+        
+        .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px; }
+        .titulo { font-size: 16pt; font-weight: bold; margin-bottom: 5px; }
+        
+        .fecha { text-align: right; margin-bottom: 20px; }
+        
+        .contenido { line-height: 1.4; margin-bottom: 15px; text-align: justify; }
+        .contenido p { margin-bottom: 8px; }
+        
+        .tabla-equipo { width: 100%; border: 1px solid #999; margin: 15px 0; }
+        .tabla-equipo th { background-color: #eee; font-weight: bold; padding: 5px; border: 1px solid #999; text-align: center;}
+        .tabla-equipo td { padding: 5px; border: 1px solid #999; }
+        
+        /* Sección de Firmas Simplificada */
+        .firmas-container { margin-top: 50px; width: 100%; }
+        .firma-col { width: 45%; text-align: center; vertical-align: top; }
+        .firma-space { width: 10%; }
+        .firma-linea { border-top: 1px solid #000; margin-top: 40px; padding-top: 5px; }
+        
+        .nota { font-size: 8pt; color: #555; margin-top: 30px; font-style: italic; text-align: center; }
+        .link { color: #0000EE; text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="titulo">BETTERDATAIT</div>
+        <div>CARTA RESPONSIVA DE ASIGNACIÓN DE EQUIPO</div>
+    </div>
+
+    <div class="fecha">
+        <strong>Fecha:</strong> {{ hoy }}
+    </div>
+
+    <table class="tabla-equipo" repeat="0">
+        <tr>
+            <th colspan="2">DATOS DEL EQUIPO ASIGNADO</th>
+        </tr>
+        <tr>
+            <td width="30%"><strong>Tipo de Dispositivo:</strong></td>
+            <td>{{ dispositivo.tipo_dispositivo }}</td>
+        </tr>
+        <tr>
+            <td><strong>Marca:</strong></td>
+            <td>{{ dispositivo.marca_nombre }}</td>
+        </tr>
+        <tr>
+            <td><strong>Modelo:</strong></td>
+            <td>{{ dispositivo.modelo }}</td>
+        </tr>
+        <tr>
+            <td><strong>Identificador (S/N / IMEI):</strong></td>
+            <td>{{ dispositivo.identificador }}</td>
+        </tr>
+        {% if dispositivo.numerotel %}
+        <tr>
+            <td><strong>Línea Telefónica:</strong></td>
+            <td>{{ dispositivo.numerotel }}</td>
+        </tr>
+        {% endif %}
+    </table>
+
+    <div class="contenido">
+        <p>
+            Reconociendo que a partir de esta fecha queda bajo mi responsabilidad la conservación del equipo antes citado, su uso y finalidad a que se destine. Así mismo, asumo la responsabilidad que por cualquier daño que sufra el equipo y a tal fin cubriré los gastos que se generen por la reparación o reposición de este al Valor Comercial. 
+            Por lo que me hago responsable de su buen uso y conservación a utilizarlo para lo que está destinado dentro de mis condiciones de trabajo, obligándome a devolverlo cuando me sea requerido por la Empresa, o cuando cambie de Puesto o de Recinto de Trabajo. En términos de lo dispuesto por los artículos 134 fracción VI y 135 fracción IX de la Ley Federal del Trabajo.
+        </p>
+        <p>
+            Con la firma de este documento, me comprometo a darle un uso responsable y exclusivo para el desarrollo de mis actividades laborales, asumiendo las consecuencias derivadas de su incumplimiento.
+            Me obligo a reportar inmediatamente la pérdida o robo de este equipo a la Dirección de Finanzas y Administración como al área de Tecnología: <strong>avargas@bggroup.mx</strong>.
+            Así mismo, me obligo también a reponer este equipo en caso de pérdida, daño por mal uso o robo por negligencia.
+        </p>
+        <p>
+            Para más información sobre las condiciones de uso de esta Herramienta consultar la Política en: <br>
+            <span class="link">https://bestground.sharepoint.com/sites/bggroup/ti/default.aspx</span> en el módulo de <strong>SOP INFRAESTRUCTURA HW</strong>.
+        </p>
+        <p>
+            Sin otro particular, quedo de usted, suscribiendo la presente a mi libre y llana voluntad. <strong>Esta carta sustituye a la anterior.</strong>
+        </p>
+    </div>
+
+    <table class="firmas-container" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+            <td class="firma-col">
+                <div class="firma-linea">
+                    <strong>{{ usuario.nombre }} {{ usuario.apellidos }}</strong><br>
+                    Colaborador Responsable
+                </div>
+            </td>
+            <td class="firma-space">&nbsp;</td>
+            <td class="firma-col">
+                <div class="firma-linea">
+                    <strong>Departamento IT</strong><br>
+                    Entrega / Administración
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="nota">
+        Sistema de Inventario BETTERDATAIT | Documento generado el {{ hoy }}
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+<!-- 
+    usuarios.html
+    -------------
+    Muestra el listado de todos los usuarios.
+    CORRECCIÓN: El botón 'Añadir' ahora apunta a la ruta correcta 'add_edit_usuario_form'.
+-->
+{% block content %}
+    <h1 class="text-4xl font-extrabold text-gray-800 mb-6 border-b pb-2">{{ titulo }}</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="p-4 mb-4 rounded-lg 
+                    {% if category == 'success' %} bg-green-100 text-green-700 
+                    {% elif category == 'error' %} bg-red-100 text-red-700
+                    {% else %} bg-yellow-100 text-yellow-700
+                    {% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="flex justify-between items-center mb-6 gap-4">
+        <div class="relative w-full max-w-md">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </div>
+            <input type="text" id="searchUsuarios" onkeyup="filtrarTabla('searchUsuarios', 'tablaUsuarios')" 
+                   class="pl-10 focus:ring-emerald-500 focus:border-emerald-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border" 
+                   placeholder="Buscar usuario, correo, empresa...">
+        </div>
+
+        <a href="{{ url_for('inventario.add_edit_usuario') }}" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition duration-300 flex items-center whitespace-nowrap">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+            Añadir Nuevo Usuario
+        </a>
+    </div>
+
+    <div class="shadow-xl rounded-xl overflow-hidden bg-white border border-gray-200">
+        <table id="tablaUsuarios" class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-emerald-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-emerald-600 uppercase tracking-wider">ID</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-emerald-600 uppercase tracking-wider">Nombre Completo</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-emerald-600 uppercase tracking-wider">Contacto</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-emerald-600 uppercase tracking-wider">Empresa</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-emerald-600 uppercase tracking-wider">Dispositivo Asignado</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-emerald-600 uppercase tracking-wider">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for usuario in usuarios %}
+                    <tr class="hover:bg-gray-50 transition duration-150">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{{ usuario.id_usuario }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <a href="{{ url_for('inventario.usuario_detail', id_usuario=usuario.id_usuario) }}" 
+                                onclick="event.preventDefault(); openModal(this.href);"
+                                class="font-bold hover:text-emerald-600 hover:underline transition">
+                                {{ usuario.nombre }} {{ usuario.apellidos }}
+                            </a>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <p class="font-semibold">{{ usuario.correo }}</p>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ usuario.empresa_nombre }}</td>
+                        <td class="px-6 py-4 whitespace-normal text-sm text-gray-700">
+                            <div class="mb-1 p-1 border-b border-gray-100">
+                                <p class="text-xs text-blue-800 font-bold">Laptops:</p>
+                                <p class="text-xs text-blue-600">{{ usuario.laptop_info | replace(',', '<br>') | safe }}</p>
+                            </div>
+                            <div class="p-1">
+                                <p class="text-xs text-green-800 font-bold">Celulares:</p>
+                                <p class="text-xs text-green-600">{{ usuario.celular_info | replace(',', '<br>') | safe }}</p>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                            <!-- CORRECCIÓN AQUÍ TAMBIÉN: 'add_edit_usuario_form' -->
+                            <a href="{{ url_for('inventario.add_edit_usuario', id_usuario=usuario.id_usuario) }}" class="text-emerald-600 ...">Editar</a>
+                            <form action="{{ url_for('inventario.delete_usuario', id_usuario=usuario.id_usuario) }}" method="POST" class="inline" onsubmit="return confirm('¿Está seguro de que desea eliminar el usuario {{ usuario.apellidos }}? Esto desasignará todos sus dispositivos.');">
+                                <button type="submit" class="text-red-600 hover:text-red-800 transition duration-150 bg-transparent border-none p-0 cursor-pointer">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                            No se encontraron usuarios en el sistema.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function filtrarTabla(inputId, tableId) {
+            var input, filter, table, tr, td, i, txtValue;
+            input = document.getElementById(inputId);
+            filter = input.value.toUpperCase();
+            table = document.getElementById(tableId);
+            tr = table.getElementsByTagName("tr");
+
+            for (i = 0; i < tr.length; i++) {
+                if (!tr[i].getElementsByTagName("th").length) { 
+                    var rowText = tr[i].textContent || tr[i].innerText;
+                    if (rowText.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+    </script>
+{% endblock %}

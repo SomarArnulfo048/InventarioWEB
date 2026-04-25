@@ -1,0 +1,31 @@
+{% extends 'V2_form_base.html' %}
+
+{% block form_content %}
+    <div class="text-left">
+        <h2 class="text-2xl font-bold text-gray-800 mb-1">{{ titulo }}</h2>
+        <p class="text-sm text-gray-500 mb-6">Ingrese el nombre del registro.</p>
+    </div>
+
+    <form method="POST" action="{{ url_for('inventario.add_edit_catalogo', table_name='estado', item_id=item.id_status) if item else url_for('inventario.add_edit_catalogo', table_name='estado') }}">
+        
+        <div class="mb-6">
+            <label for="nombre" class="block text-lg font-medium text-gray-700 mb-2">Nombre del Estado</label>
+            <input type="text" id="nombre" name="nombre" 
+                   value="{{ item.estado if item else '' }}" 
+                   required 
+                   placeholder="Ej: Activo, Dañado, Baja"
+                   class="w-full border-gray-300 rounded-lg shadow-sm focus:border-emerald-500 focus:ring-emerald-500 p-3 text-lg">
+        </div>
+        
+
+        <div class="flex justify-end space-x-4 border-t pt-4">
+            <button type="button" onclick="closeModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-lg transition duration-300">
+                Cancelar
+            </button>
+            <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300">
+                {% if item %}Guardar Cambios{% else %}Añadir Estado{% endif %}
+            </button>
+        </div>
+        <tbody class="bg-white divide-y divide-gray-200"></tbody>
+    </form>
+{% endblock %}

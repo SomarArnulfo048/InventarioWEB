@@ -1,0 +1,55 @@
+{% extends 'V2_form_base.html' %}
+
+{% block form_content %}
+    <div class="flex justify-between items-center mb-6 border-b pb-2">
+        <h1 class="text-3xl font-extrabold text-gray-800">{{ titulo }}</h1>
+        <div class="flex space-x-2">
+            <a href="{{ url_for('inventario.generar_qr', id_dispositivo=dispositivo.id_dispositivo) }}" target="_blank" class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-2 px-3 rounded-lg border border-gray-300 shadow-sm text-sm flex items-center" title="QR"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4h-4v-2h4v-4H6v4H2v-4h4V9h4v2h4v2h2v4h-4v2h4v2H2v-2h2v-2H2v-4h2V9h2v2h2v-2h2v-2h2v2zM6 6h4v4H6V6zm8 0h4v4h-4V6zM6 14h4v4H6v-4z"></path></svg></a>
+            <a href="{{ url_for('inventario.ver_historial', id_dispositivo=dispositivo.id_dispositivo) }}" onclick="event.preventDefault(); openModal(this.href);" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md text-sm">Ver Historial</a>
+            
+            {% if current_user.role == 'admin' %}
+            <a href="{{ url_for('inventario.add_edit_dispositivo', tipo_id=dispositivo.tipo, id_dispositivo=dispositivo.id_dispositivo) }}" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-lg shadow-md text-sm">Editar</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="bg-white p-4 shadow-md rounded-xl lg:col-span-2 border border-gray-100">
+            <h2 class="text-xl font-bold text-gray-800 border-b-2 border-emerald-400 pb-1 mb-3">Datos Principales</h2>
+            <div class="grid grid-cols-2 gap-4 text-gray-700 text-sm">
+                <p><strong>ID:</strong> {{ dispositivo.id_dispositivo }}</p>
+                <p><strong>Marca:</strong> <span class="font-medium text-emerald-600">{{ dispositivo.marca_nombre }}</span></p>
+                <p><strong>Modelo:</strong> {{ dispositivo.modelo }}</p>
+                <p><strong>Identificador (S/N):</strong> <span class="font-mono text-emerald-700">{{ dispositivo.identificador }}</span></p>
+                <p><strong>Estado:</strong> <span class="px-2 py-0.5 rounded text-white text-xs font-bold" style="background-color: {{ dispositivo.estado_color }};">{{ dispositivo.estado_nombre }}</span></p>
+            </div>
+            
+            <h2 class="text-xl font-bold text-gray-800 border-b-2 border-emerald-400 pb-1 mt-6 mb-3">Información Financiera</h2>
+            <div class="grid grid-cols-2 gap-4 text-gray-700 text-sm">
+                <p><strong>Costo:</strong> <span class="font-mono text-emerald-700 font-bold">${{ dispositivo.costo }}</span></p>
+                <p><strong>Fecha Compra:</strong> <span>{{ dispositivo.fecha_compra or 'No registrada' }}</span></p>
+            </div>
+
+            <h2 class="text-xl font-bold text-gray-800 border-b-2 border-emerald-400 pb-1 mt-6 mb-3">Datos Adicionales</h2>
+            <p class="bg-gray-50 p-3 rounded-lg text-sm italic border border-gray-100">{{ dispositivo.extra_info or 'No hay datos adicionales.' }}</p>
+        </div>
+
+        <div class="bg-emerald-50 p-4 shadow-md rounded-xl border border-emerald-200">
+            <h2 class="text-xl font-bold text-emerald-800 border-b border-emerald-200 pb-1 mb-3">Usuario Asignado</h2>
+            {% if dispositivo.usuario %}
+                <div class="space-y-3 text-emerald-900 text-sm">
+                    <p><strong>Nombre:</strong> <span class="font-semibold">{{ dispositivo.user_nombre }} {{ dispositivo.user_apellidos }}</span></p>
+                    <p><strong>Correo:</strong> {{ dispositivo.user_correo }}</p>
+                    <p><strong>Empresa:</strong> {{ dispositivo.empresa_nombre }}</p>
+                    <div class="pt-2 border-t border-emerald-200 flex flex-col space-y-2">
+                        <a href="{{ url_for('inventario.usuario_detail', id_usuario=dispositivo.usuario) }}" onclick="event.preventDefault(); openModal(this.href);" class="text-emerald-600 font-bold underline">Ver Perfil</a>
+                        <a href="{{ url_for('inventario.descargar_pdf', id_dispositivo=dispositivo.id_dispositivo) }}" class="bg-gray-800 hover:bg-gray-900 text-white font-bold py-2 px-3 rounded-lg text-xs flex items-center justify-center">Descargar Carta Responsiva</a>
+                    </div>
+                </div>
+            {% else %}
+                <div class="text-center py-4"><p class="text-red-500 font-bold">SIN ASIGNAR</p></div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="mt-6 flex justify-end border-t pt-4"><button type="button" onclick="closeModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-lg">Cerrar</button></div>
+{% endblock %}

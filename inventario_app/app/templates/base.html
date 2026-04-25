@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ titulo }}{% endblock %} - BETTERDATAIT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; color: #1f2937; overflow-x: hidden; }
+        
+        /* Estilos del Modal */
+        .modal-overlay { z-index: 50; display: none; opacity: 0; transition: opacity 0.3s; }
+        .modal-overlay.open { display: flex; opacity: 1; }
+        .modal-content { transform: translateY(-50px); transition: transform 0.3s; }
+        .modal-overlay.open .modal-content { transform: translateY(0); }
+        .blur-sm { filter: blur(2px); }
+
+        /* Layout */
+        @media (min-width: 1024px) {
+            #sidebar { position: fixed; top: 0; left: 0; width: 280px; height: 100%; z-index: 40; }
+            #content-wrapper { margin-left: 280px; width: calc(100% - 280px); overflow-x: hidden; }
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+    
+    <div id="global-modal-overlay" class="modal-overlay fixed inset-0 bg-black bg-opacity-50 justify-center items-center">
+        <div id="global-modal-container" class="modal-content bg-white rounded-xl shadow-2xl p-6 max-h-[90vh] overflow-y-auto w-11/12 md:w-3/4 lg:w-2/3 relative"></div>
+    </div>
+
+    <aside id="sidebar" class="bg-white shadow-xl flex flex-col border-r border-gray-200 hidden lg:block">
+        <div class="p-6 border-b border-emerald-200">
+            <a href="{{ url_for('inventario.dashboard') }}" class="text-3xl font-extrabold tracking-tight text-emerald-600">BETTERDATAIT</a>
+            {% if current_user.is_authenticated %}
+            <p class="text-xs text-gray-400 mt-1 uppercase font-bold tracking-wider">
+                Rol: <span class="{{ 'text-purple-600' if current_user.role == 'admin' else 'text-blue-500' }}">{{ current_user.role }}</span>
+            </p>
+            {% endif %}
+        </div>
+        <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
+            <p class="text-xs font-semibold text-gray-500 uppercase px-2 py-2">Principal</p>
+            
+            <a href="{{ url_for('inventario.dashboard') }}" class="flex items-center space-x-3 p-3 rounded-lg text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition font-medium">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                <span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('inventario.inventario_general') }}" class="flex items-center space-x-3 p-3 rounded-lg text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition font-medium">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                <span>Inventario</span>
+            </a>
+            <a href="{{ url_for('inventario.usuarios_list') }}" class="flex items-center space-x-3 p-3 rounded-lg text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition font-medium">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                <span>Usuarios</span>
+            </a>
+            
+            {% if current_user.is_authenticated and current_user.role == 'admin' %}
+            <div class="pt-4 border-t border-gray-100 mt-4">
+                <p class="text-xs font-semibold text-gray-500 uppercase px-2 py-2">Administración</p>
+                
+                <a href="{{ url_for('inventario.gestion_accesos') }}" class="flex items-center space-x-3 p-3 rounded-lg text-sm hover:bg-emerald-50 hover:text-emerald-700">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    <span>Gestión de Accesos</span>
+                </a>
+                
+                <p class="text-xs font-semibold text-gray-400 uppercase px-2 py-2 mt-2">Catálogos</p>
+                <a href="{{ url_for('inventario.tipos_list') }}" class="flex items-center space-x-3 p-3 rounded-lg text-sm hover:bg-emerald-50 hover:text-emerald-700">Tipos de Disp.</a>
+                <a href="{{ url_for('inventario.estados_list') }}" class="flex items-center space-x-3 p-3 rounded-lg text-sm hover:bg-emerald-50 hover:text-emerald-700">Estados</a>
+                <a href="{{ url_for('inventario.marcas_list') }}" class="flex items-center space-x-3 p-3 rounded-lg text-sm hover:bg-emerald-50 hover:text-emerald-700">Marcas</a>
+                <a href="{{ url_for('inventario.empresas_list') }}" class="flex items-center space-x-3 p-3 rounded-lg text-sm hover:bg-emerald-50 hover:text-emerald-700">Empresas</a>
+            </div>
+            {% endif %}
+
+            <div class="pt-10">
+                <a href="{{ url_for('inventario.logout') }}" class="flex items-center space-x-3 p-3 rounded-lg text-red-600 hover:bg-red-50 hover:text-red-700 transition font-medium">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                    <span>Cerrar Sesión</span>
+                </a>
+            </div>
+        </nav>
+    </aside>
+
+    <div id="content-wrapper" class="w-full">
+        <header class="lg:hidden bg-white shadow-md border-b-2 border-emerald-500 p-4 flex justify-between items-center">
+            <span class="text-xl font-bold text-emerald-600">BETTERDATAIT</span>
+            <a href="{{ url_for('inventario.logout') }}" class="text-red-500 text-sm font-bold">Salir</a>
+        </header>
+        <main id="main-content" class="container mx-auto px-4 py-8">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <footer class="mt-12 text-center text-gray-500 text-sm py-4 border-t border-gray-200">
+        &copy; 2025 BETTERDATAIT | Sistema de Inventario
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // --- 1. LÓGICA DEL MODAL ---
+        const modalOverlay = document.getElementById('global-modal-overlay');
+        const modalContainer = document.getElementById('global-modal-container');
+        const mainContent = document.getElementById('main-content');
+
+        function openModal(url) {
+            mainContent.classList.add('blur-sm', 'pointer-events-none');
+            modalOverlay.classList.add('open');
+            modalContainer.innerHTML = `<div class="p-8 text-center"><svg class="animate-spin h-8 w-8 text-emerald-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><p class="mt-4 text-gray-600">Cargando...</p></div>`;
+            
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) return response.text().then(text => { throw new Error(text) });
+                    return response.text();
+                })
+                .then(html => {
+                    modalContainer.innerHTML = html;
+                    // Agregar botón cerrar si no existe
+                    if(!modalContainer.querySelector('button[onclick="closeModal()"]')) {
+                         modalContainer.innerHTML += `<button onclick="closeModal()" class="absolute top-3 right-3 text-gray-500 hover:text-gray-800 focus:outline-none"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    closeModal();
+                    Swal.fire('Error', 'No se pudo cargar el formulario.', 'error');
+                });
+        }
+
+        function closeModal() {
+            modalOverlay.classList.remove('open');
+            modalContainer.innerHTML = '';
+            mainContent.classList.remove('blur-sm', 'pointer-events-none');
+            // Recargar página al cerrar para actualizar datos
+            if(document.querySelector('form')) window.location.reload(); 
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modalOverlay.classList.contains('open')) closeModal();
+        });
+
+        // --- 2. INTERCEPTOR DE CLICS (ESTE FALTABA) ---
+        // Detecta automáticamente los enlaces de edición/detalle y abre el modal
+        document.addEventListener('click', function(e) {
+            const link = e.target.closest('a');
+            
+            // Si no es un enlace, o si es para descargar (target=_blank), no hacemos nada
+            if (!link || link.target === '_blank') return;
+
+            const url = link.href;
+
+            // Lista de palabras clave para abrir en modal
+            if (url.includes('/add_edit') || 
+                url.includes('/detail') || 
+                url.includes('/historial') ||
+                url.includes('/catalogo/add_edit')) {
+                
+                e.preventDefault(); // ¡ALTO! No navegues
+                openModal(url);     // Abre la ventanita
+            }
+        });
+
+        // --- 3. ALERTAS DE CONFIRMACIÓN ---
+        function confirmarEliminacion(event, formElement, texto) {
+            event.preventDefault();
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: texto || "No podrás revertir esta acción.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#10B981',
+                cancelButtonColor: '#EF4444',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) formElement.submit();
+            });
+        }
+    </script>
+</body>
+</html>

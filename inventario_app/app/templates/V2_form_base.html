@@ -1,0 +1,26 @@
+<!-- 
+    V2_form_base.html
+    -------------------
+    Plantilla base ligera para todos los formularios que se cargan dentro del Modal.
+    No incluye <html>, <body>, ni Sidebar.
+-->
+<div class="modal-content-wrapper">
+    <!-- Manejo de Mensajes Flash dentro del Modal -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="mb-4">
+                {% for category, message in messages %}
+                    <div class="p-3 rounded-lg text-sm font-medium 
+                        {% if category == 'success' %} bg-green-100 text-green-700 
+                        {% else %} bg-red-100 text-red-700 
+                        {% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Aquí se inyectará el formulario específico (Bloque 'form_content') -->
+    {% block form_content %}{% endblock %}
+</div>
